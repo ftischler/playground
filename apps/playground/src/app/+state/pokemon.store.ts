@@ -22,27 +22,29 @@ export const PokemonStore = signalStore(
   withState({
     _searchQuery: 'pikachu',
   }),
-  withProps((store, httpClient = inject(HttpClient)) => ({
+  withProps(() => ({
+    _httpClient: inject(HttpClient),
+  })),
+  withProps(({ _httpClient, ...store }) => ({
     _pokemonNamesResource: rxResource({
       loader: () =>
-        httpClient.get<PokemonList>(
+        _httpClient.get<PokemonList>(
           'https://pokeapi.co/api/v2/pokemon?limit=10'
         ),
     }),
     _searchResultResource: rxResource({
       request: store._searchQuery,
       loader: ({ request: name }) =>
-        httpClient
+        _httpClient
           .get<Pokemon>(`https://pokeapi.co/api/v2/pokemon/${name}`)
           .pipe(map((res) => mapToPokemon(res))),
     }),
     searchQuery: linkedSignal(() => store._searchQuery()),
-    httpClient: inject(HttpClient),
   })),
   withComputed((store) => ({
     pokemonNames: computed(() => store._pokemonNamesResource.value()?.results),
   })),
-  withProps((store, httpClient = inject(HttpClient)) => ({
+  withProps(({ _httpClient, ...store }) => ({
     searchResult: store._searchResultResource.value,
     searchLoading: store._searchResultResource.isLoading,
     _cardsResources: rxResource({
@@ -50,7 +52,7 @@ export const PokemonStore = signalStore(
       loader: ({ request: names }) =>
         forkJoin(
           names.map((name) =>
-            httpClient
+            _httpClient
               .get<Pokemon>(`https://pokeapi.co/api/v2/pokemon/${name}`)
               .pipe(map((res) => mapToPokemon(res)))
           )
