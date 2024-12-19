@@ -15,6 +15,8 @@
     "@angular/platform-server": "~19.0.0",
     "@angular/router": "~19.0.0",
     "@angular/ssr": "~19.0.0",
+    "@ngrx/operators": "^19.0.0",
+    "@ngrx/signals": "^19.0.0",
     "express": "~4.18.2",
     "rxjs": "~7.8.0",
     "zone.js": "~0.15.0"
